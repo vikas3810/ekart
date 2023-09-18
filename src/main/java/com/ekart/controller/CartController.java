@@ -30,18 +30,18 @@ public class CartController {
     private final JwtService jwtService;
 
     // Add a product to the cart
-    @PostMapping("/addToCart")
-    public ResponseEntity<ApiResponse> addToCart(@RequestBody @Valid CartDto cartDto,
+    @PostMapping("/addProductToCart")
+    public ResponseEntity<ApiResponse> addProductToCart(@RequestBody @Valid CartDto cartDto,
                                                  HttpServletRequest request
     ) throws UnAuthorizedUserException, EntityAlreadyExistException, InvalidCategoryTypeException, DocumentAlreadyExistsException {
-        log.info("addToCart called in cart controller ");
+        log.info("addProductToCart called in cart controller ");
         // Get email from JWT(request)
         String emailId = getEmailFromJwt(request);
 
         // Check authorization
         compareJwtEmailIdAndCustomerEmailId(request, jwtService, emailId);
 
-        int result = cartService.addToCart(cartDto, emailId);
+        int result = cartService.addProductToCart(cartDto, emailId);
         ApiResponse apiResponse = new ApiResponse(HttpStatus.CREATED.value(), "Cart is created successfully", result);
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }

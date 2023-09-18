@@ -6,7 +6,7 @@ import com.ekart.model.CartProduct;
 import jakarta.validation.Valid;
 
 public interface CartService {
-    int addToCart(@Valid CartDto cartDto, String emailId) ;
+    int addProductToCart(@Valid CartDto cartDto, String emailId) ;
     String deleteFromCart(@Valid int productId, String emailId);
     CartProduct update(int productId, String emailId, int quantity);
 

@@ -44,7 +44,7 @@ public class AuthenticationHelper {
 
 public static void adminAuthorized(String emailId) throws UnAuthorizedUserException {
 
-        if(!emailId.contains("@ekart")){
+        if(!emailId.contains("@EKART")){
             throw new UnAuthorizedUserException("UnAuthorized user only admin can do");
         }
     }

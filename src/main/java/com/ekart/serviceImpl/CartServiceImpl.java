@@ -16,6 +16,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,8 +32,8 @@ public class CartServiceImpl implements CartService {
     private final CartProductRepo cartProductRepo;
 
     @Override
-    public int addToCart(CartDto cartDto, String emailId) {
-        log.info("Inside addToCart method");
+    public int addProductToCart(CartDto cartDto, String emailId) {
+        log.info("Inside addProductToCart method");
 
         // Retrieve the user entity
         User user = userRepo.findByEmailId(emailId)
@@ -50,8 +51,8 @@ public class CartServiceImpl implements CartService {
         log.info("Cart available for user: " + cart.getCartId());
 
         // Check if the product is already in the cart
-        Optional<CartProduct> existingProduct = cart.getCartProducts().stream()
-                .filter(p -> p.getCartProductId() == cartDto.getProductId())
+        Optional<Product> existingProduct = cart.getProducts().stream()
+                .filter(p -> p.getProductId() == cartDto.getProductId())
                 .findFirst();
 
         if (existingProduct.isPresent()) {
@@ -60,10 +61,10 @@ public class CartServiceImpl implements CartService {
             double newSubTotal = calculateNewSubTotal(cart.getSubTotal(), cartDto.getQuantity(), product.getPrice());
             cart.setSubTotal(newSubTotal);
         } else {
-            CartProduct cartProduct = CartProduct.builder().build();
+
             // Add the product to the cart
-            cart.getCartProducts().add(cartProduct);
-            cart.setSubTotal(cart.getSubTotal() + calculateSubTotal(cartDto.getQuantity(), product.getProductId()));
+            cart.getProducts().add(product);
+            cart.setSubTotal(cart.getSubTotal() + calculateSubTotal(cartDto.getQuantity(), product.getPrice()));
         }
 
         // Save the updated cart
@@ -83,11 +84,13 @@ public class CartServiceImpl implements CartService {
                 .user(user)
                 .isActive(true)
                 .subTotal(0.0)
-                .cartProducts(new ArrayList<>())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .products(new ArrayList<>())
                 .build();
     }
-    private double calculateSubTotal(int quantity, int productId) {
-        return quantity * productId;
+    private double calculateSubTotal(int quantity, double price) {
+        return quantity * price;
     }
 
     private double calculateNewSubTotal(double oldSubTotal, int quantity, double price) {
@@ -96,19 +99,21 @@ public class CartServiceImpl implements CartService {
     //Helper method update CartProductRelationship
     private void updateCartProductRelationship(Cart cart, Product product, int quantity) {
         log.info("updateCartProductRelationship ");
-        Optional<CartProduct> cartProduct = cartProductRepo
+        Optional<CartProduct> optionalCartProduct = cartProductRepo
                 .findByCartCartIdAndProductProductId(cart.getCartId(), product.getProductId());
 
-        if (cartProduct.isPresent()) {
+        if (optionalCartProduct.isPresent()) {
             // Update the existing relationship
-            CartProduct p = cartProduct.get();
-            p.setQuantity(p.getQuantity() + quantity);
+            CartProduct cartProduct = optionalCartProduct.get();
+            cartProduct.setSubtotal(calculateNewSubTotal(cartProduct.getSubtotal(),quantity,product.getPrice()));
+            cartProduct.setQuantity(cartProduct.getQuantity() + quantity);
         } else {
             // Create a new cart-product relationship
             CartProduct newCartProduct = CartProduct.builder()
                     .cart(cart)
                     .product(product)
                     .quantity(quantity)
+                    .subtotal(quantity*product.getPrice())
                     .build();
             cartProductRepo.save(newCartProduct);
         }
@@ -123,11 +128,14 @@ public class CartServiceImpl implements CartService {
         // Find the user's cart
         Cart cart = cartRepo.findByUserUserId(user.getUserId()).orElseThrow(ResourceNotFoundException::new);
         // Get the list of products in the cart
-        List<Product> productList = cart.getProduct();
+        List<Product> productList = cart.getProducts();
         // Find the product to be deleted by its ID
         Optional<Product> productToDelete = productList.stream()
                 .filter(product -> product.getProductId() == productId)
                 .findFirst();
+        if(productList.size()==1){
+
+        }
         if (productToDelete.isPresent()) {
             // Remove the product from the cart
             productList.remove(productToDelete.get());
@@ -158,7 +166,7 @@ public class CartServiceImpl implements CartService {
             System.out.println("................"+cart2);
         }
 
-        List<Product> productList = cart.getProduct();
+        List<Product> productList = cart.getProducts();
         return cart2;
     }
 

@@ -23,8 +23,8 @@ public class Cart {
     private double subTotal;
     @OneToOne
     private User user;
-    @ManyToMany
-    private List<CartProduct> cartProducts = new ArrayList<>();
+    @OneToMany
+    private List<Product> products = new ArrayList<>();
 
     private LocalDateTime createdAt;
 

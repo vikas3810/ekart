@@ -38,7 +38,7 @@ public class CategoryController {
         log.info("addCategory called in CategoryController controller ");
         //get email from JWT(request)
         String emailId = getEmailFromJwt(request);
-System.out.println(emailId);
+
         //Check emailId belong to admin or not (contains @ekart)
         adminAuthorized(emailId);
 
