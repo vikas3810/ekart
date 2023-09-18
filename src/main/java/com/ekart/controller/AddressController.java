@@ -35,9 +35,6 @@ public class AddressController {
         //get email from JWT(request)
         String emailId = getEmailFromJwt(request);
 
-        //Check emailId belong to admin or not (contains @ekart)
-        adminAuthorized(emailId);
-
         //check authorization
         compareJwtEmailIdAndCustomerEmailId(request,jwtService,emailId);
 
@@ -54,9 +51,6 @@ public class AddressController {
         log.info("inside deleteAddress method controller");
         //get email from JWT(request)
         String emailId = getEmailFromJwt(request);
-
-        //Check emailId belong to admin or not (contains @ekart)
-        adminAuthorized(emailId);
 
         //check authorization
         compareJwtEmailIdAndCustomerEmailId(request,jwtService,emailId);
@@ -77,9 +71,6 @@ public class AddressController {
         //get email from JWT(request)
         String emailId = getEmailFromJwt(request);
 
-        //Check emailId belong to admin or not (contains @ekart)
-        adminAuthorized(emailId);
-
         //check authorization
         compareJwtEmailIdAndCustomerEmailId(request,jwtService,emailId);
 
@@ -94,9 +85,6 @@ public class AddressController {
         log.info("display all addresses ");
         //get email from JWT(request)
         String emailId = getEmailFromJwt(request);
-
-        //Check emailId belong to admin or not (contains @ekart)
-        adminAuthorized(emailId);
 
         //check authorization
         compareJwtEmailIdAndCustomerEmailId(request,jwtService,emailId);
