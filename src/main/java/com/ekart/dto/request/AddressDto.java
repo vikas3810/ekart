@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddressDto {
-        @NotNull(message = "addressLine1 should not be null")
+    @NotNull(message = "addressLine1 should not be null")
     private String addressLine1;
 
     private String addressLine2;

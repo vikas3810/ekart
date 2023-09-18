@@ -31,6 +31,13 @@ public class CartServiceImpl implements CartService {
     private final ProductRepo productRepo;
     private final CartProductRepo cartProductRepo;
 
+    /**
+     * Adds a product to the user's cart.
+     *
+     * @param cartDto  The DTO containing product and quantity information.
+     * @param emailId  The email ID of the user.
+     * @return The ID of the updated cart.
+     */
     @Override
     public int addProductToCart(CartDto cartDto, String emailId) {
         log.info("Inside addProductToCart method");

@@ -20,8 +20,16 @@ import java.util.List;
 public class AddressServiceImpl implements AddressService {
     private final AddressRepo addressRepo;
     private final UserRepo userRepo;
+
+    /**
+     * Adds a new address for a user.
+     *
+     * @param addressDto The DTO containing address information.
+     * @param emailId    The email ID of the user.
+     * @return A message indicating the address has been added.
+     */
     @Override
-    public String addAddress(@Valid AddressDto addressDto,String emailId) {
+    public String addAddress(@Valid AddressDto addressDto, String emailId) {
         User user = userRepo.findByEmailId(emailId).orElseThrow(ResourceNotFoundException::new);
         Address address = Address.builder()
                 .addressLine1(addressDto.getAddressLine1())
@@ -35,17 +43,30 @@ public class AddressServiceImpl implements AddressService {
         return "Address Added";
     }
 
+    /**
+     * Deletes an existing address by its ID.
+     *
+     * @param addressId The ID of the address to be deleted.
+     * @return A message indicating the address has been deleted.
+     */
     @Override
-    public String deleteAddress( int addressId) {
+    public String deleteAddress(int addressId) {
         Address address = addressRepo.findById(addressId).orElseThrow(ResourceNotFoundException::new);
         addressRepo.delete(address);
         return "Address deleted";
     }
 
+    /**
+     * Updates an existing address by its ID.
+     *
+     * @param addressId  The ID of the address to be updated.
+     * @param addressDto The DTO containing updated address information.
+     * @return A message indicating the address has been updated.
+     */
     @Override
     public String updateAddress(int addressId, AddressDto addressDto) {
         Address address = addressRepo.findById(addressId).orElseThrow(ResourceNotFoundException::new);
-         address.setAddressLine1(addressDto.getAddressLine1());
+        address.setAddressLine1(addressDto.getAddressLine1());
         address.setAddressLine2(addressDto.getAddressLine2());
         address.setCity(addressDto.getCity());
         address.setPinCode(addressDto.getPinCode());
@@ -55,6 +76,12 @@ public class AddressServiceImpl implements AddressService {
         return "Address updated";
     }
 
+    /**
+     * Retrieves all addresses associated with a user by their email ID.
+     *
+     * @param emailId The email ID of the user.
+     * @return A list of addresses belonging to the user.
+     */
     @Override
     public List<Address> getAllAddress(String emailId) {
         User user = userRepo.findByEmailId(emailId).orElseThrow(ResourceNotFoundException::new);

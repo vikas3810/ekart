@@ -38,11 +38,18 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
+    /**
+     * Registers a new user.
+     *
+     * @param userRegisterDto The DTO containing user registration information.
+     * @return The ID of the registered user.
+     * @throws EntityAlreadyExistException if a user with the provided email already exists.
+     */
     @Override
     public int register(@Valid UserRegisterDto userRegisterDto) throws EntityAlreadyExistException {
         log.info("Inside Register method");
         if (userRepo.existsByEmailId(userRegisterDto.getEmailId())) {
-            throw new EntityAlreadyExistException("User already register with given emailId");
+            throw new EntityAlreadyExistException("User already registered with the given emailId");
         }
         Account account = Account.builder()
                 .openingDate(LocalDateTime.now())
@@ -60,10 +67,17 @@ public class AuthServiceImpl implements AuthService {
                 .role(RoleType.USER)
                 .build();
 
-        User registerUser = userRepo.save(user);
-        return registerUser.getUserId();
+        User registeredUser = userRepo.save(user);
+        return registeredUser.getUserId();
     }
 
+    /**
+     * Authenticates a user based on login credentials.
+     *
+     * @param userLoginDto The DTO containing user login credentials.
+     * @return An authentication response containing access and refresh tokens.
+     * @throws InvalidCredentials if the provided credentials are invalid.
+     */
     @Override
     public AuthenticationResponse authenticate(UserLoginDto userLoginDto) throws InvalidCredentials {
         try {
@@ -91,13 +105,24 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
+    /**
+     * Performs a guest login.
+     *
+     * @param guestLoginDto The DTO containing guest login information.
+     * @return An authentication response for the guest.
+     */
     @Override
     public AuthenticationResponse guestLogin(GuestLoginDto guestLoginDto) {
         return AuthenticationResponse.builder()
                 .build();
     }
 
-
+    /**
+     * Saves a user token in the token repository.
+     *
+     * @param user     The user for whom the token is saved.
+     * @param jwtToken The JWT token to be saved.
+     */
     public void saveUserToken(User user, String jwtToken) {
         var token = Token.builder()
                 .user(user)
@@ -109,6 +134,11 @@ public class AuthServiceImpl implements AuthService {
         tokenRepository.save(token);
     }
 
+    /**
+     * Revokes all valid user tokens.
+     *
+     * @param user The user for whom tokens are revoked.
+     */
     private void revokeAllUserTokens(User user) {
         var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getUserId());
         if (validUserTokens.isEmpty())
