@@ -33,61 +33,87 @@ public class Controller {
     private final ProductService productService;
     private final ProductRepo productRepo;
     private final CategoryRepo categoryRepo;
+
+    /**
+     * Get all categories.
+     *
+     * @return ResponseEntity containing a list of categories.
+     */
     @GetMapping(value = "/getAllCategory")
-
     public ResponseEntity<ApiResponse> getAllCategory() {
-        log.info("display all category ");
+        log.info("Display all categories");
         List<Category> list = categoryService.dispAllCategory();
-        List<Category> p = list.stream().filter(Category::isActive).collect(Collectors.toList());
-        ApiResponse apiresponse = new ApiResponse(HttpStatus.OK.value(), "List of category", list);
-        return new ResponseEntity<>(apiresponse, HttpStatus.OK);
+        List<Category> activeCategories = list.stream().filter(Category::isActive).collect(Collectors.toList());
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), "List of categories", activeCategories);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
+    /**
+     * Get category images by category ID.
+     *
+     * @param categoryId The category ID.
+     * @return ResponseEntity containing a list of category images.
+     */
     @GetMapping(value = "/{categoryId}/getCategoryImagesByCategoryId")
-
     public ResponseEntity<ApiResponse> getCategoryImagesByCategoryId(@PathVariable int categoryId) {
-        log.info("display all category image");
+        log.info("Display all category images");
         List<CategoryDocuments> list = categoryDocumentsService.getCategoryImagesByCategoryId(categoryId);
-        ApiResponse apiresponse = new ApiResponse(HttpStatus.OK.value(), "List of images", list);
-        return new ResponseEntity<>(apiresponse, HttpStatus.OK);
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), "List of images", list);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
+
+    /**
+     * Get category details by category ID.
+     *
+     * @param categoryId The category ID.
+     * @return ResponseEntity containing category details.
+     */
     @GetMapping(value = "/{categoryId}/getCategoryByCategoryId")
-
     public ResponseEntity<ApiResponse> getCategoryByCategoryId(@PathVariable int categoryId) {
-        log.info("display all category image");
+        log.info("Display category details");
         Category category = categoryRepo.findById(categoryId).orElseThrow(ResourceNotFoundException::new);
-        ApiResponse apiresponse = new ApiResponse(HttpStatus.OK.value(), "Category Details", category);
-        return new ResponseEntity<>(apiresponse, HttpStatus.OK);
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), "Category Details", category);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
+
+    /**
+     * Get all products.
+     *
+     * @return ResponseEntity containing a list of products.
+     */
     @GetMapping(value = "/getAllProduct")
-
     public ResponseEntity<ApiResponse> getAllProduct() {
-        log.info("get All Product ");
+        log.info("Get All Products");
         List<Product> list = productService.dispAllProduct();
-        ApiResponse apiresponse = new ApiResponse(HttpStatus.OK.value(), "List of product", list);
-        return new ResponseEntity<>(apiresponse, HttpStatus.OK);
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), "List of products", list);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
-
-
-
+    /**
+     * Get product images by product ID.
+     *
+     * @param productId The product ID.
+     * @return ResponseEntity containing a list of product images.
+     */
     @GetMapping(value = "/{productId}/getProductImagesByProductId")
-
     public ResponseEntity<ApiResponse> getProductImagesByProductId(@PathVariable int productId) {
-        log.info("display all product image");
+        log.info("Display all product images");
         List<ProductDocuments> list = productDocumentsService.getProductImagesByProductId(productId);
-        ApiResponse apiresponse = new ApiResponse(HttpStatus.OK.value(), "List of images", list);
-        return new ResponseEntity<>(apiresponse, HttpStatus.OK);
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), "List of images", list);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
-
+    /**
+     * Get product details by product ID.
+     *
+     * @param productId The product ID.
+     * @return ResponseEntity containing product details.
+     */
     @GetMapping(value = "/{productId}/getProductByProductId")
-
     public ResponseEntity<ApiResponse> getProductByProductId(@PathVariable int productId) {
-        log.info("display all product image");
+        log.info("Display product details");
         Product product = productRepo.findById(productId).orElseThrow(ResourceNotFoundException::new);
-
-        ApiResponse apiresponse = new ApiResponse(HttpStatus.OK.value(), "Product Details", product);
-        return new ResponseEntity<>(apiresponse, HttpStatus.OK);
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), "Product Details", product);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 }
