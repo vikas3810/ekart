@@ -76,8 +76,6 @@ public class CartServiceImpl implements CartService {
 
         return savedCart.getCartId();
     }
-
-    //Helper method
     private Cart createNewCartForUser(User user) {
         log.info("Cart not available for user, creating a new cart");
         return Cart.builder()
@@ -92,21 +90,23 @@ public class CartServiceImpl implements CartService {
     private double calculateSubTotal(int quantity, double price) {
         return quantity * price;
     }
-
     private double calculateNewSubTotal(double oldSubTotal, int quantity, double price) {
         return oldSubTotal+(quantity*price);
     }
-    //Helper method update CartProductRelationship
+
     private void updateCartProductRelationship(Cart cart, Product product, int quantity) {
         log.info("updateCartProductRelationship ");
+
         Optional<CartProduct> optionalCartProduct = cartProductRepo
                 .findByCartCartIdAndProductProductId(cart.getCartId(), product.getProductId());
 
         if (optionalCartProduct.isPresent()) {
+            log.info("update in cartProduct.......");
             // Update the existing relationship
             CartProduct cartProduct = optionalCartProduct.get();
             cartProduct.setSubtotal(calculateNewSubTotal(cartProduct.getSubtotal(),quantity,product.getPrice()));
             cartProduct.setQuantity(cartProduct.getQuantity() + quantity);
+            cartProductRepo.save(cartProduct);
         } else {
             // Create a new cart-product relationship
             CartProduct newCartProduct = CartProduct.builder()
@@ -117,29 +117,37 @@ public class CartServiceImpl implements CartService {
                     .build();
             cartProductRepo.save(newCartProduct);
         }
+
     }
-
-
     @Override
     public String deleteFromCart(int productId, String emailId) {
         log.info("inside delete product From Cart method");
-        // Find the user by email ID
-        User user = userRepo.findByEmailId(emailId).orElseThrow(ResourceNotFoundException::new);
-        // Find the user's cart
-        Cart cart = cartRepo.findByUserUserId(user.getUserId()).orElseThrow(ResourceNotFoundException::new);
-        // Get the list of products in the cart
+
+        // Retrieve the user entity
+        User user = userRepo.findByEmailId(emailId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        // Try to find an existing cart for the user
+        Cart cart = cartRepo.findByUserUserId(user.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
+        CartProduct cartProduct = cartProductRepo.findByCartCartIdAndProductProductId(cart.getCartId(),productId).orElseThrow(() -> new ResourceNotFoundException("CartProduct not found"));
+             // Get the list of products in the cart
         List<Product> productList = cart.getProducts();
+
         // Find the product to be deleted by its ID
-        Optional<Product> productToDelete = productList.stream()
+        Optional<Product> productToDeleteFromCart = productList.stream()
                 .filter(product -> product.getProductId() == productId)
                 .findFirst();
-        if(productList.size()==1){
 
-        }
-        if (productToDelete.isPresent()) {
+
+        if (productToDeleteFromCart.isPresent()) {
             // Remove the product from the cart
-            productList.remove(productToDelete.get());
-            cart.setSubTotal(cart.getSubTotal()-productToDelete.get().getPrice());
+            productList.remove(productToDeleteFromCart.get());
+            cart.setSubTotal(cart.getSubTotal()-(cartProduct.getQuantity()*productToDeleteFromCart.get().getPrice()));
+           if(productList.isEmpty()){
+               cart.setSubTotal(0.0);
+           }
+           cartProductRepo.delete(cartProduct);
             // Update the cart in the database
             cartRepo.save(cart);
             return "Product deleted from the cart.";
@@ -147,29 +155,38 @@ public class CartServiceImpl implements CartService {
             return "Product not found in the cart.";
         }
     }
-
-
     @Override
-    public CartProduct update(int productId, String emailId, int quantity) {
+    public String update(int productId, String emailId, int quantity) {
         log.info("update cart");
-        // Find the user by email ID
-        User user = userRepo.findByEmailId(emailId).orElseThrow(ResourceNotFoundException::new);
-        // Find the user's cart
-        Cart cart = cartRepo.findByUserUserId(user.getUserId()).orElseThrow(ResourceNotFoundException::new);
+        // Retrieve the user entity
+        User user = userRepo.findByEmailId(emailId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-       Optional<CartProduct> cart1 = cartProductRepo.findByCartCartIdAndProductProductId(cart.getCartId(),productId);
+        // Try to find an existing cart for the user
+        Cart cart = cartRepo.findByUserUserId(user.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
+        CartProduct cartProduct = cartProductRepo.findByCartCartIdAndProductProductId(cart.getCartId(),productId).orElseThrow(() -> new ResourceNotFoundException("CartProduct not found"));
         // Get the list of products in the cart
-        CartProduct cart2 = new CartProduct();
-        if (cart1.isPresent()){
-             cart2=cart1.get();
-        cart2.setQuantity(cart2.getQuantity()+quantity);
-            System.out.println("................"+cart2);
-        }
-
         List<Product> productList = cart.getProducts();
-        return cart2;
-    }
+        // Find the product to be deleted by its ID
+        Optional<Product> productToDeleteFromCart = productList.stream()
+                .filter(product -> product.getProductId() == productId)
+                .findFirst();
+        if (productToDeleteFromCart.isPresent()) {
+            cart.setSubTotal(cart.getSubTotal() - ((cartProduct.getQuantity()-quantity) * productToDeleteFromCart.get().getPrice()));
+            cartProduct.setQuantity(quantity);
+            cartProduct.setSubtotal(quantity*productToDeleteFromCart.get().getPrice());
 
+            if (productList.isEmpty()) {
+                cart.setSubTotal(0.0);
+            }
+
+        }
+       // Update the cart in the database
+        cartProductRepo.save(cartProduct);
+            cartRepo.save(cart);
+        return "cart updated";
+    }
     @Override
     public Cart getCart(String emailId) {
         log.info("get user cart by emailId");

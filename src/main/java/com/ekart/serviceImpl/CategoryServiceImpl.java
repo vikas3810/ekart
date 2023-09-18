@@ -29,6 +29,7 @@ import java.util.Optional;
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepo categoryRepo;
     private final UserRepo userRepo;
+
     @Override
     public int addCategory(CategoryDto categoryDto, String emailId) throws InvalidCategoryTypeException, DocumentAlreadyExistsException {
         log.info("Inside addCategory method");
@@ -36,7 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
         CategoryType categoryType = getCategoryType(categoryDto.getCategoryType().toString());
         checkCategoryTypeDuplication(categoryType);
         Category category = Category.builder()
-                .categoryType(categoryDto.getCategoryType())
+                .categoryType(categoryType)
                 .description(categoryDto.getDescription())
                 .createdBy(user.getEmailId())
                 .createdDate(LocalDateTime.now())
@@ -58,9 +59,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public String update(int categoryId, String emailId, CategoryDto categoryDto) {
+    public String update(int categoryId, String emailId, CategoryDto categoryDto) throws InvalidCategoryTypeException {
         Category category = categoryRepo.findById(categoryId).orElseThrow(ResourceNotFoundException::new);
-        category.setCategoryType(categoryDto.getCategoryType());
+        category.setCategoryType(getCategoryType(categoryDto.getCategoryType()));
         category.setDescription(categoryDto.getDescription());
         category.setModifiedBy(emailId);
         category.setModifiedDate(LocalDateTime.now());
@@ -84,6 +85,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
     public CategoryType getCategoryType(String type) throws InvalidCategoryTypeException {
         CategoryType categoryType;
+        log.info("getCategoryType ");
         try {
             categoryType = CategoryType.valueOf(type.toUpperCase());
         } catch (IllegalArgumentException e) {

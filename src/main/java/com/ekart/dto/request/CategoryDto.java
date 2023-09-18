@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class CategoryDto {
 
     @NotNull(message = "Category Name should not be null")
-    private CategoryType categoryType;
+    private String categoryType;
     @NotNull(message = "slug should not be null")
     private String slug;
     @NotNull(message = "description should not be null")

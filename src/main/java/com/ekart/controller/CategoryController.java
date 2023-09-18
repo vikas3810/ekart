@@ -76,7 +76,7 @@ public class CategoryController {
     public ResponseEntity<ApiResponse> updateCategory(@PathVariable int categoryId,
                                                      HttpServletRequest request,
                                                      @RequestBody @Valid CategoryDto categoryDto
-    ) throws UnAuthorizedUserException {
+    ) throws UnAuthorizedUserException, InvalidCategoryTypeException {
         log.info("inside updateProduct method controller");
         //get email from JWT(request)
         String emailId = getEmailFromJwt(request);

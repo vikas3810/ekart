@@ -80,7 +80,7 @@ public class CartController {
     }
 
 
-    @GetMapping("/updateCart/{productId}/{quantity}")
+    @PostMapping("/updateCart/{productId}/{quantity}")
     public ResponseEntity<ApiResponse> updateCart(
             @PathVariable @Valid int productId,
             @PathVariable @Valid int quantity,HttpServletRequest request
@@ -92,7 +92,7 @@ public class CartController {
         // Check authorization
         compareJwtEmailIdAndCustomerEmailId(request, jwtService, emailId);
 
-        CartProduct result = cartService.update(productId, emailId,quantity);
+        String result = cartService.update(productId, emailId,quantity);
         ApiResponse apiResponse = new ApiResponse(HttpStatus.CREATED.value(), "Cart updated successfully", result);
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }

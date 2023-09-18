@@ -8,7 +8,7 @@ import jakarta.validation.Valid;
 public interface CartService {
     int addProductToCart(@Valid CartDto cartDto, String emailId) ;
     String deleteFromCart(@Valid int productId, String emailId);
-    CartProduct update(int productId, String emailId, int quantity);
+    String update(int productId, String emailId, int quantity);
 
     Cart getCart(String emailId);
 }

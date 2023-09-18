@@ -25,8 +25,14 @@ public class GlobalExceptionHandler {
 		String validationErrors = ex.getBindingResult().getFieldError().getDefaultMessage();
 		return ResponseEntity.badRequest().body(validationErrors);
 	}
-
 	@ExceptionHandler(ExpiredJwtException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public ResponseEntity<ApiResponse> handleIoJsonWebTokenExpiredException(ExpiredJwtException ex) {
+		log.info("handleIoJsonWebTokenExpiredException fired");
+		ApiResponse apiResponse = new ApiResponse(400,"something went wrong",ex.getMessage());
+		return new ResponseEntity<ApiResponse>(apiResponse,HttpStatus.BAD_REQUEST);
+	}
+	@ExceptionHandler(JwtExpiredException.class)
 	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
 	public ResponseEntity<ApiResponse> handleJwtExpiredException(JwtExpiredException ex){
 		log.info("handleJwtExpiredException fired");
