@@ -1,9 +1,6 @@
 package com.ekart.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -11,16 +8,19 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ProductCart {
+public class CartProduct {
     @Id
     @GeneratedValue
-    private Long id;
-
+    private int cartProductId;
     @ManyToOne
+    @JoinColumn(name = "cart_id")
     private Cart cart;
 
     @ManyToOne
+    @JoinColumn(name = "product_id")
     private Product product;
 
     private int quantity;
+
+    private double subtotal;
 }

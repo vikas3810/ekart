@@ -40,11 +40,16 @@ public class User implements UserDetails {
     @JoinColumn(name = "accountFK")
     private Account account;
 
+    @OneToOne
+    private Cart cart;
+
     @OneToMany(targetEntity = Address.class,mappedBy = "user",fetch = FetchType.EAGER)
-//	@JsonIgnoreProperties(value = "user")
+
+    @JoinColumn(name = "address_id")
     private List<Address> addresses = new ArrayList<>();
 
     @OneToMany
+    @JoinColumn(name = "order_id")
     private List<Orders> orders = new ArrayList<>();
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

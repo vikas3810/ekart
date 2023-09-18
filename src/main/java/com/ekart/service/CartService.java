@@ -1,20 +1,14 @@
 package com.ekart.service;
 
-import com.ekart.dto.request.CategoryDto;
-import com.ekart.dto.request.ProductDto;
-import com.ekart.exception.DocumentAlreadyExistsException;
-import com.ekart.exception.EntityAlreadyExistException;
-import com.ekart.exception.InvalidCategoryTypeException;
-import com.ekart.model.Category;
+import com.ekart.dto.request.CartDto;
+import com.ekart.model.Cart;
+import com.ekart.model.CartProduct;
 import jakarta.validation.Valid;
 
-import java.util.List;
+public interface CartService {
+    int addToCart(@Valid CartDto cartDto, String emailId) ;
+    String deleteFromCart(@Valid int productId, String emailId);
+    CartProduct update(int productId, String emailId, int quantity);
 
-public interface CategoryService {
-    int addCategory(@Valid CategoryDto categoryDto, String emailId) throws EntityAlreadyExistException, InvalidCategoryTypeException, DocumentAlreadyExistsException;
-    String delete(@Valid int categoryId);
-
-    String update(int categoryId, String emailId, CategoryDto categoryDto);
-
-    List<Category> dispAllCategory();
+    Cart getCart(String emailId);
 }

@@ -94,7 +94,7 @@ public class CategoryDocumentsServiceImpl implements CategoryDocumentsService {
     }
 
     @Override
-    public List<CategoryDocuments> getCategoryByCategoryId(int categoryId) {
+    public List<CategoryDocuments> getCategoryImagesByCategoryId(int categoryId) {
         return categoryDocumentsRepo.findByCategoryCategoryIdAndIsActive(categoryId,true);
     }
 }

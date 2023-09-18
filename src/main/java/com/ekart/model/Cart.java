@@ -19,14 +19,14 @@ public class Cart {
     @Id
     @GeneratedValue
     private int cartId;
-
-    private String createdBy;
-    private LocalDateTime createdDate;
-    private String modifiedBy;
-    private LocalDateTime modifiedDate;
     private boolean isActive;
+    private double subTotal;
     @OneToOne
     private User user;
-    @OneToMany
-    private List<Product> product = new ArrayList<>();
+    @ManyToMany
+    private List<CartProduct> cartProducts = new ArrayList<>();
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 }

@@ -2,6 +2,7 @@ package com.ekart.exception;
 
 
 import com.ekart.dto.response.ApiResponse;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -25,13 +26,13 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.badRequest().body(validationErrors);
 	}
 
-//	@ExceptionHandler(JwtExpiredException.class)
-//	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
-//	public ResponseEntity<ApiResponse> handleJwtExpiredException(JwtExpiredException ex){
-//		log.info("handleJwtExpiredException fired");
-//		ApiResponse apiResponse = new ApiResponse(400,"something went wrong",ex.getMessage());
-//		return new ResponseEntity<ApiResponse>(apiResponse,HttpStatus.BAD_REQUEST);
-//	}
+	@ExceptionHandler(ExpiredJwtException.class)
+	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+	public ResponseEntity<ApiResponse> handleJwtExpiredException(JwtExpiredException ex){
+		log.info("handleJwtExpiredException fired");
+		ApiResponse apiResponse = new ApiResponse(400,"something went wrong",ex.getMessage());
+		return new ResponseEntity<ApiResponse>(apiResponse,HttpStatus.BAD_REQUEST);
+	}
 		@ExceptionHandler(InvalidCredentials.class)
 		@ResponseStatus(code = HttpStatus.BAD_REQUEST)
 		public ResponseEntity<ApiResponse> handleIcsdException(InvalidCredentials ex){

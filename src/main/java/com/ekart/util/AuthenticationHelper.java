@@ -41,19 +41,11 @@ public class AuthenticationHelper {
             throw new UnAuthorizedUserException("Unauthorized user");
         }
     }
-//    public static void adminAuthorized(HttpServletRequest request,JwtService jwtService) throws UnAuthorizedUserException {
-//        String jwt = request.getHeader("Authorization").substring(7);
-//        String jwtEmail = jwtService.extractEmailId(jwt);
-//        boolean t = jwtEmail.contains("@ekart");
-//        if(!jwtEmail.contains("@ekart")){
-//            throw new UnAuthorizedUserException("UnAuthorized user");
-//        }
-//    }
+
 public static void adminAuthorized(String emailId) throws UnAuthorizedUserException {
 
-        if(!emailId.contains("@EKART")){
-            System.out.println("......................"+emailId);
-            throw new UnAuthorizedUserException("UnAuthorized user");
+        if(!emailId.contains("@ekart")){
+            throw new UnAuthorizedUserException("UnAuthorized user only admin can do");
         }
     }
     public static String getName(HttpServletRequest request, HttpServletResponse response) {

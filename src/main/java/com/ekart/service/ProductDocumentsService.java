@@ -12,5 +12,5 @@ import java.util.List;
 public interface ProductDocumentsService {
     String upload(String emailId, int productId, MultipartFile file) throws FileFormatNotSupportedException, IOException;
 
-    List<ProductDocuments> getProductByProductId(int productId);
+    List<ProductDocuments> getProductImagesByProductId(int productId);
 }

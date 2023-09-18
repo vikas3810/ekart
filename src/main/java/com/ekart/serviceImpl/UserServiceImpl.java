@@ -42,22 +42,30 @@ public class UserServiceImpl implements UserService {
         String otp = generateOTP(emailId);
         String subject = "change password";
         sendOTPMail(emailId,otp,subject,javaMailSender);
-return otp;
+        return otp;
     }
 
     @Override
     public String verifyOTPAndUpdatePassword(@Valid ForgotPasswordDto forgotPasswordDto) {
         log.info("inside verifyOtpAndUpdatePassword method in service");
         User user = userRepo.findByEmailId(forgotPasswordDto.getEmailId()).orElseThrow(ResourceNotFoundException::new);
-//        verifyOTP(forgotPasswordDto.getEmailId(),forgotPasswordDto.getOtp().toString());
-
         user.setPassword(passwordEncoder.encode(forgotPasswordDto.getNewPassword()));
         user.setConfirmPassword(passwordEncoder.encode(forgotPasswordDto.getNewPassword()));
         userRepo.save(user);
         return "Password Reset successfully";
     }
 
+    @Override
+    public User getUserByUserId(String emailId, Integer userId) {
+        log.info("inside getUserByUserId method in service");
 
+        return userRepo.findById(userId).orElseThrow(ResourceNotFoundException::new);
+    }
+
+    @Override
+    public User getUserByEmailId(String emailId) {
+        return userRepo.findByEmailId(emailId).orElseThrow(ResourceNotFoundException::new);
+    }
 
 
 }

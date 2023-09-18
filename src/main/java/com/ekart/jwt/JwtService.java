@@ -1,6 +1,7 @@
 package com.ekart.jwt;
 
 import com.ekart.model.User;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,7 +41,7 @@ public class JwtService {
         final Claims claims  = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
-    private Claims extractAllClaims(String token){
+    private Claims extractAllClaims(String token) throws ExpiredJwtException {
         log.info("extractAllClaims called in JwtService");
             return Jwts.parserBuilder()
                     .setSigningKey(getSigningKey())

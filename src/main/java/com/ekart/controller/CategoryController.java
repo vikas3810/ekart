@@ -35,10 +35,10 @@ public class CategoryController {
     public ResponseEntity<ApiResponse> addCategory(@RequestBody @Valid CategoryDto categoryDto,
                                                 HttpServletRequest request
     ) throws EntityAlreadyExistException, InvalidCategoryTypeException, UnAuthorizedUserException, DocumentAlreadyExistsException {
-        log.info("addCategory category called in CategoryController controller ");
+        log.info("addCategory called in CategoryController controller ");
         //get email from JWT(request)
         String emailId = getEmailFromJwt(request);
-
+System.out.println(emailId);
         //Check emailId belong to admin or not (contains @ekart)
         adminAuthorized(emailId);
 

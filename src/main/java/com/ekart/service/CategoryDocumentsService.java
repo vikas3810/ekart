@@ -16,5 +16,5 @@ public interface CategoryDocumentsService {
     String delete(int categoryId, String type) throws InvalidCategoryTypeException;
     byte[] download(int categoryId, String documentType) throws IOException, InvalidCategoryTypeException;
 
-    List<CategoryDocuments> getCategoryByCategoryId(int categoryId);
+    List<CategoryDocuments> getCategoryImagesByCategoryId(int categoryId);
 }

@@ -4,6 +4,7 @@ import com.ekart.dto.request.ForgotPasswordDto;
 import com.ekart.dto.response.ApiResponse;
 import com.ekart.exception.UnAuthorizedUserException;
 import com.ekart.jwt.JwtService;
+import com.ekart.model.User;
 import com.ekart.service.UserService;
 import com.ekart.util.AuthenticationHelper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +26,25 @@ public class UserController {
 
     private final UserService userService;
     private final JwtService jwtService;
-
+    @GetMapping("/getUser")
+    public ResponseEntity<ApiResponse> getUser(HttpServletRequest request) throws UnAuthorizedUserException {
+        log.info("getUser called in user controller");
+        String emailId = getEmailFromJwt(request);
+        AuthenticationHelper.compareJwtEmailIdAndCustomerEmailId(request, jwtService,emailId);
+        User result = userService.getUserByEmailId(emailId);
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), "Retrieve Successfully", result);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+    @GetMapping("/getUserByUserId/{userId}")
+    public ResponseEntity<ApiResponse> getUserByUserId(@PathVariable Integer userId,
+                                                      HttpServletRequest request) throws UnAuthorizedUserException {
+        log.info("getUserByUserId called in user controller");
+        String emailId = getEmailFromJwt(request);
+        AuthenticationHelper.compareJwtEmailIdAndCustomerEmailId(request, jwtService,emailId);
+        User result = userService.getUserByUserId(emailId,userId);
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), "Retrieve Successfully", result);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
     @PostMapping("/updatePassword/{newPassword}")
     public ResponseEntity<ApiResponse> updatePassword(@PathVariable String newPassword,
                                             HttpServletRequest request) throws UnAuthorizedUserException {

@@ -64,7 +64,7 @@ public class ProductDocumentsServiceImpl implements ProductDocumentsService {
     }
 
     @Override
-    public List<ProductDocuments> getProductByProductId(int productId) {
+    public List<ProductDocuments> getProductImagesByProductId(int productId) {
         return productDocumentsRepo.findByProductProductIdAndIsActive(productId,true);
     }
 }

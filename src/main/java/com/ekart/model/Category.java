@@ -31,6 +31,6 @@ public class Category {
     private LocalDateTime modifiedDate;
     private boolean isActive;
     @OneToMany(mappedBy = "category",fetch = FetchType.EAGER)
-    @JsonIgnore
+//    @JsonIgnore
     private List<Product> products = new ArrayList<>();
 }
