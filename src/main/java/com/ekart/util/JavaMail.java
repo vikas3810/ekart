@@ -21,4 +21,32 @@ public class JavaMail {
         javaMailSender.send(message);
         log.info(subject+" email Sent Successfully");
     }
+
+
+    public static void sendOrderPlacedMail(String emailId,int orderId,String subject,JavaMailSender javaMailSender) {
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("${spring.mail.username}");
+        message.setTo(emailId);
+
+        message.setText("Hi Dear" + "\n" + "You have placed order successfully."+"\nYour order Id is "+orderId
+        );
+        message.setSubject(subject);
+        javaMailSender.send(message);
+        log.info(subject+" email Sent Successfully");
+    }
+
+
+    public static void sendOrderCancelMail(String emailId,int orderId,String subject,JavaMailSender javaMailSender) {
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("${spring.mail.username}");
+        message.setTo(emailId);
+
+        message.setText("Hi Dear" + "\n" + "You have placed order successfully."+"\nYour order Id is "+orderId
+        );
+        message.setSubject(subject);
+        javaMailSender.send(message);
+        log.info(subject+" email Sent Successfully");
+    }
 }

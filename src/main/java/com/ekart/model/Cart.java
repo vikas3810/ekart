@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Cart {
+public class Cart implements Serializable {
     @Id
     @GeneratedValue
     private int cartId;
@@ -23,7 +24,7 @@ public class Cart {
     private double subTotal;
     @OneToOne
     private User user;
-    @OneToMany
+    @ManyToMany
     private List<Product> products = new ArrayList<>();
 
     private LocalDateTime createdAt;

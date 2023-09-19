@@ -12,10 +12,11 @@ import java.util.Optional;
 
 public interface CartProductRepo extends JpaRepository<CartProduct,Integer> {
 
-    Optional<CartProduct> findByCartCartIdAndProductProductId(int cartId, int productId);
+    Optional<CartProduct> findByCartCartIdAndProductProductIdAndIsDeleted(int cartId, int productId,boolean isDeleted);
     @Transactional
     @Modifying
     @Query("UPDATE CartProduct cp SET cp.quantity = :quantity WHERE cp.cart.cartId = :cartId AND cp.product.productId = :productId")
     void updateQuantityByCartIdAndProductId(@Param("quantity") int quantity,@Param("cartId") int cartId, @Param("productId") int productId);
 
+    List<CartProduct> findByCartCartIdAndIsDeleted(int cartId,boolean isDeleted);
 }

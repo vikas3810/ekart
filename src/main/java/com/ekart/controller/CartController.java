@@ -2,13 +2,9 @@ package com.ekart.controller;
 
 import com.ekart.dto.request.CartDto;
 import com.ekart.dto.response.ApiResponse;
-import com.ekart.exception.DocumentAlreadyExistsException;
-import com.ekart.exception.EntityAlreadyExistException;
-import com.ekart.exception.InvalidCategoryTypeException;
 import com.ekart.exception.UnAuthorizedUserException;
 import com.ekart.jwt.JwtService;
 import com.ekart.model.Cart;
-import com.ekart.model.CartProduct;
 import com.ekart.service.CartService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -18,7 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.ekart.util.AuthenticationHelper.*;
+import static com.ekart.util.AuthenticationHelper.compareJwtEmailIdAndCustomerEmailId;
+import static com.ekart.util.AuthenticationHelper.getEmailFromJwt;
 
 @RestController
 @RequestMapping("/cart")
@@ -33,7 +30,7 @@ public class CartController {
     @PostMapping("/addProductToCart")
     public ResponseEntity<ApiResponse> addProductToCart(@RequestBody @Valid CartDto cartDto,
                                                  HttpServletRequest request
-    ) throws UnAuthorizedUserException, EntityAlreadyExistException, InvalidCategoryTypeException, DocumentAlreadyExistsException {
+    ) throws UnAuthorizedUserException {
         log.info("addProductToCart called in cart controller ");
         // Get email from JWT(request)
         String emailId = getEmailFromJwt(request);
@@ -49,7 +46,7 @@ public class CartController {
     // Retrieve the user's cart
     @GetMapping("/getCart")
     public ResponseEntity<ApiResponse> getCart(HttpServletRequest request
-    ) throws UnAuthorizedUserException, EntityAlreadyExistException, InvalidCategoryTypeException, DocumentAlreadyExistsException {
+    ) throws UnAuthorizedUserException {
         log.info("getCart called in cart controller ");
         // Get email from JWT(request)
         String emailId = getEmailFromJwt(request);
@@ -66,7 +63,7 @@ public class CartController {
     @GetMapping("/deleteFromCartProductByProductId/{productId}")
     public ResponseEntity<ApiResponse> deleteFromCartProductByProductId(
             @PathVariable @Valid int productId, HttpServletRequest request
-    ) throws UnAuthorizedUserException, EntityAlreadyExistException, InvalidCategoryTypeException, DocumentAlreadyExistsException {
+    ) throws UnAuthorizedUserException{
         log.info("deleteFromCartProductByProductId called in cart controller ");
         // Get email from JWT(request)
         String emailId = getEmailFromJwt(request);
@@ -84,7 +81,7 @@ public class CartController {
     public ResponseEntity<ApiResponse> updateCart(
             @PathVariable @Valid int productId,
             @PathVariable @Valid int quantity,HttpServletRequest request
-    ) throws UnAuthorizedUserException, EntityAlreadyExistException, InvalidCategoryTypeException, DocumentAlreadyExistsException {
+    ) throws UnAuthorizedUserException {
         log.info("updateCart called in cart controller ");
         // Get email from JWT(request)
         String emailId = getEmailFromJwt(request);

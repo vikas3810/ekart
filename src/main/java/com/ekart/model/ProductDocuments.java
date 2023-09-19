@@ -10,13 +10,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
-public class ProductDocuments {
+public class ProductDocuments implements Serializable {
     @Id
     @GeneratedValue
     private int productDocumentId;

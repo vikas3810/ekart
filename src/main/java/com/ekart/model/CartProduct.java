@@ -3,12 +3,14 @@ package com.ekart.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CartProduct {
+public class CartProduct implements Serializable {
     @Id
     @GeneratedValue
     private int cartProductId;
@@ -21,6 +23,6 @@ public class CartProduct {
     private Product product;
 
     private int quantity;
-
+    private boolean isDeleted;
     private double subtotal;
 }

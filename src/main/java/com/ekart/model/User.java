@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class User implements UserDetails {
+public class User implements UserDetails, Serializable {
     @Id
     @GeneratedValue
     private int userId;
@@ -39,9 +40,6 @@ public class User implements UserDetails {
     @OneToOne(targetEntity = Account.class,fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
     @JoinColumn(name = "accountFK")
     private Account account;
-
-    @OneToOne
-    private Cart cart;
 
     @OneToMany(targetEntity = Address.class,mappedBy = "user",fetch = FetchType.EAGER)
     private List<Address> addresses = new ArrayList<>();

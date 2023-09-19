@@ -105,7 +105,7 @@ public class CartServiceImpl implements CartService {
         log.info("updateCartProductRelationship ");
 
         Optional<CartProduct> optionalCartProduct = cartProductRepo
-                .findByCartCartIdAndProductProductId(cart.getCartId(), product.getProductId());
+                .findByCartCartIdAndProductProductIdAndIsDeleted(cart.getCartId(), product.getProductId(),false);
 
         if (optionalCartProduct.isPresent()) {
             log.info("update in cartProduct.......");
@@ -118,6 +118,7 @@ public class CartServiceImpl implements CartService {
             // Create a new cart-product relationship
             CartProduct newCartProduct = CartProduct.builder()
                     .cart(cart)
+                    .isDeleted(false)
                     .product(product)
                     .quantity(quantity)
                     .subtotal(quantity*product.getPrice())
@@ -137,7 +138,10 @@ public class CartServiceImpl implements CartService {
         // Try to find an existing cart for the user
         Cart cart = cartRepo.findByUserUserId(user.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
-        CartProduct cartProduct = cartProductRepo.findByCartCartIdAndProductProductId(cart.getCartId(),productId).orElseThrow(() -> new ResourceNotFoundException("CartProduct not found"));
+
+        CartProduct cartProduct = cartProductRepo.findByCartCartIdAndProductProductIdAndIsDeleted(cart.getCartId(),productId,false)
+
+                .orElseThrow(() -> new ResourceNotFoundException("CartProduct not found"));
              // Get the list of products in the cart
         List<Product> productList = cart.getProducts();
 
@@ -146,15 +150,16 @@ public class CartServiceImpl implements CartService {
                 .filter(product -> product.getProductId() == productId)
                 .findFirst();
 
-
         if (productToDeleteFromCart.isPresent()) {
             // Remove the product from the cart
             productList.remove(productToDeleteFromCart.get());
             cart.setSubTotal(cart.getSubTotal()-(cartProduct.getQuantity()*productToDeleteFromCart.get().getPrice()));
+
            if(productList.isEmpty()){
                cart.setSubTotal(0.0);
            }
-           cartProductRepo.delete(cartProduct);
+           cartProduct.setDeleted(true);
+           cartProductRepo.save(cartProduct);
             // Update the cart in the database
             cartRepo.save(cart);
             return "Product deleted from the cart.";
@@ -172,7 +177,8 @@ public class CartServiceImpl implements CartService {
         // Try to find an existing cart for the user
         Cart cart = cartRepo.findByUserUserId(user.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
-        CartProduct cartProduct = cartProductRepo.findByCartCartIdAndProductProductId(cart.getCartId(),productId).orElseThrow(() -> new ResourceNotFoundException("CartProduct not found"));
+        CartProduct cartProduct = cartProductRepo.findByCartCartIdAndProductProductIdAndIsDeleted(cart.getCartId(),productId,false)
+                .orElseThrow(() -> new ResourceNotFoundException("CartProduct not found"));
         // Get the list of products in the cart
         List<Product> productList = cart.getProducts();
         // Find the product to be deleted by its ID
