@@ -7,7 +7,6 @@ import com.ekart.dto.response.AuthenticationResponse;
 import com.ekart.exception.EntityAlreadyExistException;
 import com.ekart.exception.InvalidCredentials;
 import com.ekart.jwt.JwtService;
-import com.ekart.model.Account;
 import com.ekart.model.RoleType;
 import com.ekart.model.User;
 import com.ekart.repo.UserRepo;
@@ -47,21 +46,17 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public int register(@Valid UserRegisterDto userRegisterDto) throws EntityAlreadyExistException {
-        log.info("Inside Register method");
+        log.info("Inside Register/SignUp method");
         if (userRepo.existsByEmailId(userRegisterDto.getEmailId())) {
             throw new EntityAlreadyExistException("User already registered with the given emailId");
         }
-        Account account = Account.builder()
-                .openingDate(LocalDateTime.now())
-                .build();
-
         User user = User.builder()
                 .firstName(userRegisterDto.getFirstName().toUpperCase())
                 .lastName(userRegisterDto.getLastName().toUpperCase())
-                .emailId(userRegisterDto.getEmailId().toUpperCase())
+                .emailId(userRegisterDto.getEmailId().toLowerCase())
                 .contactNumber(userRegisterDto.getContactNumber())
                 .gender(userRegisterDto.getGender())
-                .account(account)
+
                 .password(passwordEncoder.encode(userRegisterDto.getPassword()))
                 .registrationDate(LocalDateTime.now())
                 .role(RoleType.USER)
@@ -88,8 +83,6 @@ public class AuthServiceImpl implements AuthService {
                     )
             );
         } catch (BadCredentialsException ex) {
-            // Handle invalid credentials here, for example, you can log the error.
-            // You can also throw a custom exception or return an error response.
             throw new InvalidCredentials("Invalid credentials provided.");
         }
         User user = userRepo.findByEmailId(userLoginDto.getEmailId())

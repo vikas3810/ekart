@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@Table(name = "user", schema = "public")
 @Entity
 @Data
 @AllArgsConstructor
@@ -37,9 +38,9 @@ public class User implements UserDetails, Serializable {
 
     @Enumerated(EnumType.STRING)
     private RoleType role;
-    @OneToOne(targetEntity = Account.class,fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "accountFK")
-    private Account account;
+//    @OneToOne(targetEntity = Account.class,fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
+//    @JoinColumn(name = "accountFK")
+//    private Account account;
 
     @OneToMany(targetEntity = Address.class,mappedBy = "user",fetch = FetchType.EAGER)
     private List<Address> addresses = new ArrayList<>();

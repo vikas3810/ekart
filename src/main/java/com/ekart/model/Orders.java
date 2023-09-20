@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -27,4 +29,8 @@ public class Orders implements Serializable {
     private User user;
     @ManyToMany
     private List<CartProduct> product = new ArrayList<>();
+    @ManyToOne
+  private Address address;
+
+
 }

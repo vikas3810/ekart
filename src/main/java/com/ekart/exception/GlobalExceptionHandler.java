@@ -4,6 +4,7 @@ package com.ekart.exception;
 import com.ekart.dto.response.ApiResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
+import org.postgresql.util.PSQLException;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +19,19 @@ import org.springframework.web.context.request.WebRequest;
 @Slf4j
 public class GlobalExceptionHandler {
 
+	@ExceptionHandler(value = PSQLException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ResponseEntity<ApiResponse> handleDatabaseExceptions(PSQLException e) {
+		log.info("handleDatabaseExceptions fired");
+		ApiResponse apiResponse = new ApiResponse(400,"something went wrong",e.getMessage());
+		return new ResponseEntity<ApiResponse>(apiResponse,HttpStatus.BAD_REQUEST);
+
+	}
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ResponseBody
 	public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException ex) {
+		log.info("handleValidationException fired");
 		String validationErrors = ex.getBindingResult().getFieldError().getDefaultMessage();
 		return ResponseEntity.badRequest().body(validationErrors);
 	}
@@ -41,7 +51,8 @@ public class GlobalExceptionHandler {
 	}
 		@ExceptionHandler(InvalidCredentials.class)
 		@ResponseStatus(code = HttpStatus.BAD_REQUEST)
-		public ResponseEntity<ApiResponse> handleIcsdException(InvalidCredentials ex){
+		public ResponseEntity<ApiResponse> handleInvalidCredentialsException(InvalidCredentials ex){
+		log.info("handleInvalidCredentialsException fired");
 			ApiResponse apiResponse = new ApiResponse(400,"something went wrong",ex.getMessage());
 			return new ResponseEntity<ApiResponse>(apiResponse,HttpStatus.BAD_REQUEST);
 		}
@@ -49,8 +60,7 @@ public class GlobalExceptionHandler {
 
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(IncompleteDataException.class)
-	public ResponseEntity<ApiResponse> handleIncompleteDataException(IncompleteDataException ex,
-																		  WebRequest webRequest)
+	public ResponseEntity<ApiResponse> handleIncompleteDataException(IncompleteDataException ex,WebRequest webRequest)
 	{
 		log.info("handleIncompleteDataException fired");
 		return new ResponseEntity<>(new ApiResponse(HttpStatus.NOT_ACCEPTABLE.value(), ex.getMessage()),
@@ -59,8 +69,7 @@ public class GlobalExceptionHandler {
 
 	    @ResponseStatus(HttpStatus.BAD_REQUEST)
 	    @ExceptionHandler(EntityAlreadyExistException.class)
-	    public ResponseEntity<ApiResponse> handleEntityAlreadyExistsException(EntityAlreadyExistException ex,
-	                                                                          WebRequest webRequest) 
+	    public ResponseEntity<ApiResponse> handleEntityAlreadyExistsException(EntityAlreadyExistException ex, WebRequest webRequest)
 	    {
 	    	log.info("handleEntityAlreadyExistsException fired");
 	        return new ResponseEntity<>(new ApiResponse(HttpStatus.NOT_ACCEPTABLE.value(), ex.getMessage()),
@@ -71,7 +80,7 @@ public class GlobalExceptionHandler {
 	    @ResponseStatus(HttpStatus.NOT_FOUND)
 	    public ResponseEntity<ApiResponse> handleResourecNotFoundExecption(ResourceNotFoundException ex, WebRequest webRequest) 
 	    {
-	    	log.info("handleResourecNotFoundExecption fired");
+	    	log.info("handleResourceNotFoundExecution fired");
 	        return new ResponseEntity<>(new ApiResponse(HttpStatus.NOT_ACCEPTABLE.value(), ex.getMessage()),
 	                HttpStatus.BAD_REQUEST);
 	    }

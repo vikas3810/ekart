@@ -27,8 +27,8 @@ public class EkartApplication {
 //			var admin = RegisterRequest.builder()
 //					.firstname("Admin")
 //					.lastname("Admin")
-//					.email("admin@gmail.com")
-//					.password("password")
+//					.email("admin@ekart.com")
+//					.password("Admin@135")
 //					.role(ADMIN)
 //					.build();
 //			System.out.println("Admin token: " + authController.adminRegister(admin).getAccessToken());

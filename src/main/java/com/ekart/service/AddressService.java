@@ -6,13 +6,14 @@ import com.ekart.model.Category;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.Set;
 
 public interface AddressService {
-    String addAddress(@Valid AddressDto addressDto,String emailId);
+    Address addAddress(@Valid AddressDto addressDto,String emailId);
     String deleteAddress(@Valid int addressId);
     
 
-    String updateAddress(int addressId, AddressDto addressDto);
+    Address updateAddress(int addressId, AddressDto addressDto);
 
-    List<Address> getAllAddress(String emailId);
+    Set<Address> getAllAddress(String emailId);
 }

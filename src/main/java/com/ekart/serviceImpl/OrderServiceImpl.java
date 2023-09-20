@@ -1,13 +1,7 @@
 package com.ekart.serviceImpl;
 
-import com.ekart.model.Cart;
-import com.ekart.model.CartProduct;
-import com.ekart.model.Orders;
-import com.ekart.model.User;
-import com.ekart.repo.CartProductRepo;
-import com.ekart.repo.CartRepo;
-import com.ekart.repo.OrderRepo;
-import com.ekart.repo.UserRepo;
+import com.ekart.model.*;
+import com.ekart.repo.*;
 import com.ekart.service.CartService;
 import com.ekart.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +26,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartProductRepo cartProductRepo;
     private final CartService cartService;
     private final JavaMailSender javaMailSender;
+    private final AddressRepo addressRepo;
 
     /**
      * Place an order for a user based on their cart contents.
@@ -42,7 +37,7 @@ public class OrderServiceImpl implements OrderService {
      */
 
     @Override
-    public String orderNow(String emailId) {
+    public String orderNow(String emailId, int addressId) {
         log.info("Inside orderNow method");
 
         // Retrieve the user entity
@@ -56,6 +51,13 @@ public class OrderServiceImpl implements OrderService {
         // Retrieve cart products that are not marked as deleted
         List<CartProduct> cartProductList = cartProductRepo.findByCartCartIdAndIsDeleted(cart.getCartId(), false);
 
+        if (cartProductList.isEmpty()){
+           throw new ResourceNotFoundException("cart Product not found");
+       }
+
+Address address = addressRepo.findById(addressId)
+        .orElseThrow(ResourceNotFoundException::new);
+
         // Create an order
         Orders order = Orders.builder()
                 .createdDate(LocalDateTime.now())
@@ -63,6 +65,7 @@ public class OrderServiceImpl implements OrderService {
                 .modifiedDate(LocalDateTime.now())
                 .product(cartProductList)
                 .user(user)
+                .address(address)
                 .build();
 
         // Perform payment processing
@@ -98,41 +101,6 @@ public class OrderServiceImpl implements OrderService {
         return true;
     }
 
-//    public String orderNow(String emailId) {
-//        log.info("Inside orderNow method");
-//
-//        // Retrieve the user entity
-//        User user = userRepo.findByEmailId(emailId)
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-//
-//        // Find the cart for the user
-//        Cart cart = cartRepo.findByUserUserId(user.getUserId())
-//                .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
-//
-//        // Retrieve cart products that are not marked as deleted
-//        List<CartProduct> cartProductList = cartProductRepo.findByCartCartIdAndIsDeleted(cart.getCartId(), false);
-//
-//        // Create an order
-//        Orders order = Orders.builder()
-//                .createdDate(LocalDateTime.now())
-//                .isActive(true)
-//                .modifiedDate(LocalDateTime.now())
-//                .product(cartProductList)
-//                .user(user)
-//                .build();
-//        Orders saveOrder = orderRepo.save(order);
-//        int orderId = saveOrder.getOrderId();
-//
-//        // Remove purchased products from the cart
-//        cartProductList.forEach(cartProduct ->
-//                cartService.deleteFromCart(cartProduct.getProduct().getProductId(), emailId));
-//
-//        // Send an order placed email
-//        String subject = "Order Placed Successfully";
-//        sendOrderPlacedMail(emailId, orderId, subject, javaMailSender);
-//
-//        return "Order id : " + orderId;
-//    }
 
     /**
      * Cancel an existing order for a user.
@@ -165,7 +133,12 @@ public class OrderServiceImpl implements OrderService {
         return "Order Cancelled Successfully";
     }
 
+    @Override
+    public List<Orders> getAllOrder(String emailId) {
 
+        User user = userRepo.findByEmailId(emailId).orElseThrow(ResourceNotFoundException::new);
+        return orderRepo.findByUserUserId(user.getUserId());
+    }
 
 
 }

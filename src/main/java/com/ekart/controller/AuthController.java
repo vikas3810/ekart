@@ -36,9 +36,9 @@ public class AuthController {
 
         public AuthenticationResponse adminRegister(RegisterRequest request) {
         var user = User.builder()
-                .firstName(request.getFirstname())
-                .lastName(request.getLastname())
-                .emailId(request.getEmail())
+                .firstName(request.getFirstname().toUpperCase())
+                .lastName(request.getLastname().toUpperCase())
+                .emailId(request.getEmail().toUpperCase())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(RoleType.ADMIN)
                 .build();
@@ -64,7 +64,7 @@ public class AuthController {
 
     @PostMapping("/authenticate")
 
-    public ResponseEntity<ApiResponse> auth(@RequestBody  UserLoginDto userLoginDto) throws InvalidCredentials {
+    public ResponseEntity<ApiResponse> authenticate(@RequestBody  UserLoginDto userLoginDto) throws InvalidCredentials {
         log.info("login called in Auth controller ");
         AuthenticationResponse authenticationResponse = authService.authenticate(userLoginDto);
         ApiResponse apiresponse = new ApiResponse(HttpStatus.OK.value(), "user is validated ", authenticationResponse);

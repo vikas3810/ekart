@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.ekart.util.AuthenticationHelper.*;
 
@@ -34,12 +35,10 @@ public class AddressController {
         log.info("addAddress called  ");
         //get email from JWT(request)
         String emailId = getEmailFromJwt(request);
-
         //check authorization
         compareJwtEmailIdAndCustomerEmailId(request,jwtService,emailId);
-
-        String authenticationResponse = addressService.addAddress(addressDto,emailId);
-        ApiResponse apiresponse = new ApiResponse(HttpStatus.CREATED.value(), "Address is added successfully", authenticationResponse);
+        Address result = addressService.addAddress(addressDto,emailId);
+        ApiResponse apiresponse = new ApiResponse(HttpStatus.CREATED.value(), "Address is added successfully", result);
         return new ResponseEntity<>(apiresponse, HttpStatus.OK);
     }
 
@@ -74,7 +73,7 @@ public class AddressController {
         //check authorization
         compareJwtEmailIdAndCustomerEmailId(request,jwtService,emailId);
 
-        String result = addressService.updateAddress(addressId,addressDto);
+        Address result = addressService.updateAddress(addressId,addressDto);
         ApiResponse apiresponse = new ApiResponse(HttpStatus.CREATED.value(), "Address is updated successfully", result);
         return new ResponseEntity<>(apiresponse, HttpStatus.OK);
     }
@@ -88,7 +87,7 @@ public class AddressController {
 
         //check authorization
         compareJwtEmailIdAndCustomerEmailId(request,jwtService,emailId);
-        List<Address> list = addressService.getAllAddress(emailId);
+        Set<Address> list = addressService.getAllAddress(emailId);
         ApiResponse apiresponse = new ApiResponse(HttpStatus.OK.value(), "List of address", list);
         return new ResponseEntity<>(apiresponse, HttpStatus.OK);
     }
