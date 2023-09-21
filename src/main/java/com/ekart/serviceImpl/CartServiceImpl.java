@@ -30,12 +30,11 @@ public class CartServiceImpl implements CartService {
     private final UserRepo userRepo;
     private final ProductRepo productRepo;
     private final CartProductRepo cartProductRepo;
-
     /**
      * Adds a product to the user's cart.
      *
-     * @param cartDto  The DTO containing product and quantity information.
-     * @param emailId  The email ID of the user.
+     * @param cartDto The DTO containing product and quantity information.
+     * @param emailId The email ID of the user.
      * @return The ID of the updated cart.
      */
     @Override
@@ -49,7 +48,6 @@ public class CartServiceImpl implements CartService {
         // Retrieve the product entity
         Product product = productRepo.findById(cartDto.getProductId())
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-
 
         // Try to find an existing cart for the user
         Cart cart = cartRepo.findByUserUserId(user.getUserId())
@@ -68,7 +66,6 @@ public class CartServiceImpl implements CartService {
             double newSubTotal = calculateNewSubTotal(cart.getSubTotal(), cartDto.getQuantity(), product.getPrice());
             cart.setSubTotal(newSubTotal);
         } else {
-
             // Add the product to the cart
             cart.getProducts().add(product);
             cart.setSubTotal(cart.getSubTotal() + calculateSubTotal(cartDto.getQuantity(), product.getPrice()));
@@ -83,6 +80,7 @@ public class CartServiceImpl implements CartService {
 
         return savedCart.getCartId();
     }
+
     private Cart createNewCartForUser(User user) {
         log.info("Cart not available for user, creating a new cart");
         return Cart.builder()
@@ -94,24 +92,26 @@ public class CartServiceImpl implements CartService {
                 .products(new ArrayList<>())
                 .build();
     }
+
     private double calculateSubTotal(int quantity, double price) {
         return quantity * price;
     }
+
     private double calculateNewSubTotal(double oldSubTotal, int quantity, double price) {
-        return oldSubTotal+(quantity*price);
+        return oldSubTotal + (quantity * price);
     }
 
     private void updateCartProductRelationship(Cart cart, Product product, int quantity) {
-        log.info("updateCartProductRelationship ");
+        log.info("updateCartProductRelationship");
 
         Optional<CartProduct> optionalCartProduct = cartProductRepo
-                .findByCartCartIdAndProductProductIdAndIsDeleted(cart.getCartId(), product.getProductId(),false);
+                .findByCartCartIdAndProductProductIdAndIsDeleted(cart.getCartId(), product.getProductId(), false);
 
         if (optionalCartProduct.isPresent()) {
             log.info("update in cartProduct.......");
             // Update the existing relationship
             CartProduct cartProduct = optionalCartProduct.get();
-            cartProduct.setSubtotal(calculateNewSubTotal(cartProduct.getSubtotal(),quantity,product.getPrice()));
+            cartProduct.setSubtotal(calculateNewSubTotal(cartProduct.getSubtotal(), quantity, product.getPrice()));
             cartProduct.setQuantity(cartProduct.getQuantity() + quantity);
             cartProductRepo.save(cartProduct);
         } else {
@@ -121,15 +121,22 @@ public class CartServiceImpl implements CartService {
                     .isDeleted(false)
                     .product(product)
                     .quantity(quantity)
-                    .subtotal(quantity*product.getPrice())
+                    .subtotal(quantity * product.getPrice())
                     .build();
             cartProductRepo.save(newCartProduct);
         }
-
     }
+
+    /**
+     * Deletes a product from the user's cart.
+     *
+     * @param productId The ID of the product to be deleted.
+     * @param emailId   The email ID of the user.
+     * @return A message indicating whether the product was deleted or not.
+     */
     @Override
     public String deleteFromCart(int productId, String emailId) {
-        log.info("inside delete product From Cart method");
+        log.info("Inside deleteFromCart method");
 
         // Retrieve the user entity
         User user = userRepo.findByEmailId(emailId)
@@ -139,29 +146,25 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepo.findByUserUserId(user.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
-        CartProduct cartProduct = cartProductRepo.findByCartCartIdAndProductProductIdAndIsDeleted(cart.getCartId(),productId,false)
+        // Try to find the cart product to delete
+        Optional<CartProduct> optionalCartProduct = cartProductRepo
+                .findByCartCartIdAndProductProductIdAndIsDeleted(cart.getCartId(), productId, false);
 
-                .orElseThrow(() -> new ResourceNotFoundException("CartProduct not found"));
-             // Get the list of products in the cart
-        List<Product> productList = cart.getProducts();
+        if (optionalCartProduct.isPresent()) {
+            CartProduct cartProduct = optionalCartProduct.get();
+            Product productToDelete = cartProduct.getProduct();
+            cart.getProducts().remove(productToDelete);
 
-        // Find the product to be deleted by its ID
-        Optional<Product> productToDeleteFromCart = productList.stream()
-                .filter(product -> product.getProductId() == productId)
-                .findFirst();
+            // Update the cart subtotal
+            cart.setSubTotal(cart.getSubTotal() - cartProduct.getSubtotal());
 
-        if (productToDeleteFromCart.isPresent()) {
-            // Remove the product from the cart
-            productList.remove(productToDeleteFromCart.get());
-            cart.setSubTotal(cart.getSubTotal()-(cartProduct.getQuantity()*productToDeleteFromCart.get().getPrice()));
+            // Mark the cart product as deleted
+            cartProduct.setDeleted(true);
+            cartProductRepo.save(cartProduct);
 
-           if(productList.isEmpty()){
-               cart.setSubTotal(0.0);
-           }
-           cartProduct.setDeleted(true);
-           cartProductRepo.save(cartProduct);
-            // Update the cart in the database
+            // Save the updated cart
             cartRepo.save(cart);
+
             return "Product deleted from the cart.";
         } else {
             return "Product not found in the cart.";

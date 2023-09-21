@@ -28,69 +28,83 @@ public class CartController {
 
     // Add a product to the cart
     @PostMapping("/addProductToCart")
-    public ResponseEntity<ApiResponse> addProductToCart(@RequestBody @Valid CartDto cartDto,
-                                                 HttpServletRequest request
+    public ResponseEntity<ApiResponse> addProductToCart(
+            @RequestBody @Valid CartDto cartDto,
+            HttpServletRequest request
     ) throws UnAuthorizedUserException {
-        log.info("addProductToCart called in cart controller ");
+        log.info("addProductToCart called in cart controller");
+
         // Get email from JWT(request)
         String emailId = getEmailFromJwt(request);
 
         // Check authorization
         compareJwtEmailIdAndCustomerEmailId(request, jwtService, emailId);
 
+        // Call the service to add the product to the cart
         int result = cartService.addProductToCart(cartDto, emailId);
+
         ApiResponse apiResponse = new ApiResponse(HttpStatus.CREATED.value(), "Cart is created successfully", result);
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
     // Retrieve the user's cart
     @GetMapping("/getCart")
-    public ResponseEntity<ApiResponse> getCart(HttpServletRequest request
-    ) throws UnAuthorizedUserException {
-        log.info("getCart called in cart controller ");
+    public ResponseEntity<ApiResponse> getCart(HttpServletRequest request) throws UnAuthorizedUserException {
+        log.info("getCart called in cart controller");
+
         // Get email from JWT(request)
         String emailId = getEmailFromJwt(request);
 
         // Check authorization
         compareJwtEmailIdAndCustomerEmailId(request, jwtService, emailId);
 
+        // Call the service to retrieve the user's cart
         Cart result = cartService.getCart(emailId);
-        ApiResponse apiResponse = new ApiResponse(HttpStatus.CREATED.value(), "Cart retrieve successfully", result);
+
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), "Cart retrieved successfully", result);
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
     // Delete a product from the cart by productId
     @GetMapping("/deleteFromCartProductByProductId/{productId}")
     public ResponseEntity<ApiResponse> deleteFromCartProductByProductId(
-            @PathVariable @Valid int productId, HttpServletRequest request
-    ) throws UnAuthorizedUserException{
-        log.info("deleteFromCartProductByProductId called in cart controller ");
+            @PathVariable @Valid int productId,
+            HttpServletRequest request
+    ) throws UnAuthorizedUserException {
+        log.info("deleteFromCartProductByProductId called in cart controller");
+
         // Get email from JWT(request)
         String emailId = getEmailFromJwt(request);
 
         // Check authorization
         compareJwtEmailIdAndCustomerEmailId(request, jwtService, emailId);
 
+        // Call the service to delete the product from the cart
         String result = cartService.deleteFromCart(productId, emailId);
-        ApiResponse apiResponse = new ApiResponse(HttpStatus.CREATED.value(), "Product deleted successfully from cart", result);
+
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), "Product deleted successfully from cart", result);
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
-
+    // Update the cart with a specific quantity for a product
     @PostMapping("/updateCart/{productId}/{quantity}")
     public ResponseEntity<ApiResponse> updateCart(
             @PathVariable @Valid int productId,
-            @PathVariable @Valid int quantity,HttpServletRequest request
+            @PathVariable @Valid int quantity,
+            HttpServletRequest request
     ) throws UnAuthorizedUserException {
-        log.info("updateCart called in cart controller ");
+        log.info("updateCart called in cart controller");
+
         // Get email from JWT(request)
         String emailId = getEmailFromJwt(request);
 
         // Check authorization
         compareJwtEmailIdAndCustomerEmailId(request, jwtService, emailId);
 
-        String result = cartService.update(productId, emailId,quantity);
-        ApiResponse apiResponse = new ApiResponse(HttpStatus.CREATED.value(), "Cart updated successfully", result);
+        // Call the service to update the cart
+        String result = cartService.update(productId, emailId, quantity);
+
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), "Cart updated successfully", result);
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 }

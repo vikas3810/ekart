@@ -1,5 +1,4 @@
 package com.ekart.util;
-//
 
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -19,7 +18,6 @@ public class CacheConfig {
     public CacheManager cacheManager() {
         ConcurrentMapCacheManager cacheManager = new ConcurrentMapCacheManager();
         cacheManager.setCacheNames(List.of("byteArrayCache", "DownloadDocument", "Cache3"));
-
         return cacheManager;
     }
 

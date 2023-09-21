@@ -35,16 +35,16 @@ public class Controller {
     private final CategoryRepo categoryRepo;
 
     /**
-     * Get all categories.
+     * Get all active categories.
      *
-     * @return ResponseEntity containing a list of categories.
+     * @return ResponseEntity containing a list of active categories.
      */
     @GetMapping(value = "/getAllCategory")
     public ResponseEntity<ApiResponse> getAllCategory() {
-        log.info("Display all categories");
+        log.info("Display all active categories");
         List<Category> list = categoryService.dispAllCategory();
         List<Category> activeCategories = list.stream().filter(Category::isActive).collect(Collectors.toList());
-        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), "List of categories", activeCategories);
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), "List of active categories", activeCategories);
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
@@ -58,7 +58,7 @@ public class Controller {
     public ResponseEntity<ApiResponse> getCategoryImagesByCategoryId(@PathVariable int categoryId) {
         log.info("Display all category images");
         List<CategoryDocuments> list = categoryDocumentsService.getCategoryImagesByCategoryId(categoryId);
-        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), "List of images", list);
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), "List of category images", list);
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
@@ -99,7 +99,7 @@ public class Controller {
     public ResponseEntity<ApiResponse> getProductImagesByProductId(@PathVariable int productId) {
         log.info("Display all product images");
         List<ProductDocuments> list = productDocumentsService.getProductImagesByProductId(productId);
-        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), "List of images", list);
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), "List of product images", list);
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 

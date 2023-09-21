@@ -26,12 +26,14 @@ public class AddressServiceImpl implements AddressService {
      *
      * @param addressDto The DTO containing address information.
      * @param emailId    The email ID of the user.
-     * @return A message indicating the address has been added.
+     * @return The newly created address.
+     * @throws ResourceNotFoundException if the user is not found.
      */
     @Override
     public Address addAddress(@Valid AddressDto addressDto, String emailId) {
         User user = userRepo.findByEmailId(emailId)
-                .orElseThrow(()-> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
         Address address = Address.builder()
                 .addressLine1(addressDto.getAddressLine1())
                 .addressLine2(addressDto.getAddressLine2())
@@ -40,7 +42,8 @@ public class AddressServiceImpl implements AddressService {
                 .state(addressDto.getState())
                 .user(user)
                 .build();
-       return addressRepo.save(address);
+
+        return addressRepo.save(address);
     }
 
     /**
@@ -48,11 +51,13 @@ public class AddressServiceImpl implements AddressService {
      *
      * @param addressId The ID of the address to be deleted.
      * @return A message indicating the address has been deleted.
+     * @throws ResourceNotFoundException if the address is not found.
      */
     @Override
     public String deleteAddress(int addressId) {
         Address address = addressRepo.findById(addressId)
-                .orElseThrow(()-> new ResourceNotFoundException("Address not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
+
         addressRepo.delete(address);
         return "Address deleted";
     }
@@ -62,17 +67,20 @@ public class AddressServiceImpl implements AddressService {
      *
      * @param addressId  The ID of the address to be updated.
      * @param addressDto The DTO containing updated address information.
-     * @return A message indicating the address has been updated.
+     * @return The updated address.
+     * @throws ResourceNotFoundException if the address is not found.
      */
     @Override
     public Address updateAddress(int addressId, AddressDto addressDto) {
         Address address = addressRepo.findById(addressId)
-                .orElseThrow(()-> new ResourceNotFoundException("Address not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
+
         address.setAddressLine1(addressDto.getAddressLine1());
         address.setAddressLine2(addressDto.getAddressLine2());
         address.setCity(addressDto.getCity());
         address.setPinCode(addressDto.getPinCode());
         address.setState(addressDto.getState());
+
         return addressRepo.save(address);
     }
 
@@ -80,12 +88,14 @@ public class AddressServiceImpl implements AddressService {
      * Retrieves all addresses associated with a user by their email ID.
      *
      * @param emailId The email ID of the user.
-     * @return A list of addresses belonging to the user.
+     * @return A set of addresses belonging to the user.
+     * @throws ResourceNotFoundException if the user is not found.
      */
     @Override
     public Set<Address> getAllAddress(String emailId) {
         User user = userRepo.findByEmailId(emailId)
-                .orElseThrow(()-> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
         return addressRepo.findByUserUserId(user.getUserId());
     }
 }

@@ -33,6 +33,14 @@ public class OrderController {
     private final JwtService jwtService;
     private final OrderService orderService;
 
+    /**
+     * Place a new order.
+     *
+     * @param request    The HTTP request.
+     * @param addressId  The address ID to deliver the order.
+     * @return ResponseEntity with ApiResponse indicating success or failure.
+     * @throws UnAuthorizedUserException if the user is not authorized.
+     */
     @GetMapping("/orderNow/{addressId}")
     public ResponseEntity<ApiResponse> orderNow(HttpServletRequest request,
                                                 @PathVariable int addressId
@@ -44,15 +52,22 @@ public class OrderController {
         // Check authorization
         compareJwtEmailIdAndCustomerEmailId(request, jwtService, emailId);
 
-        String result = orderService.orderNow(emailId,addressId);
+        String result = orderService.orderNow(emailId, addressId);
         ApiResponse apiResponse = new ApiResponse(HttpStatus.CREATED.value(), "Order placed successfully", result);
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
-
+    /**
+     * Cancel an existing order by orderId.
+     *
+     * @param orderId The orderId to cancel.
+     * @param request The HTTP request.
+     * @return ResponseEntity with ApiResponse indicating success or failure.
+     * @throws UnAuthorizedUserException if the user is not authorized.
+     */
     @GetMapping("/cancelOrder/{orderId}")
     public ResponseEntity<ApiResponse> cancelOrder(@PathVariable @Valid int orderId,
-            HttpServletRequest request
+                                                   HttpServletRequest request
     ) throws UnAuthorizedUserException {
         log.info("cancelOrder called in controller ");
         // Get email from JWT(request)
@@ -61,25 +76,29 @@ public class OrderController {
         // Check authorization
         compareJwtEmailIdAndCustomerEmailId(request, jwtService, emailId);
 
-        String result = orderService.cancelOrder(emailId,orderId);
-        ApiResponse apiResponse = new ApiResponse(HttpStatus.CREATED.value(), "Order cancel successfully", result);
+        String result = orderService.cancelOrder(emailId, orderId);
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.CREATED.value(), "Order canceled successfully", result);
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
-
-
-
+    /**
+     * Get a list of all orders.
+     *
+     * @param request The HTTP request.
+     * @return ResponseEntity with ApiResponse containing a list of orders.
+     * @throws UnAuthorizedUserException if the user is not authorized.
+     */
     @GetMapping(value = "/getAllOrders")
-
     public ResponseEntity<ApiResponse> getAllOrders(HttpServletRequest request) throws UnAuthorizedUserException {
         log.info("display all orders ");
-        //get email from JWT(request)
+        // Get email from JWT(request)
         String emailId = getEmailFromJwt(request);
 
-        //check authorization
-        compareJwtEmailIdAndCustomerEmailId(request,jwtService,emailId);
+        // Check authorization
+        compareJwtEmailIdAndCustomerEmailId(request, jwtService, emailId);
+
         List<Orders> list = orderService.getAllOrder(emailId);
-        ApiResponse apiresponse = new ApiResponse(HttpStatus.OK.value(), "List of orders", list);
-        return new ResponseEntity<>(apiresponse, HttpStatus.OK);
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), "List of orders", list);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 }

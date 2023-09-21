@@ -14,10 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Set;
 
-import static com.ekart.util.AuthenticationHelper.*;
+import static com.ekart.util.AuthenticationHelper.compareJwtEmailIdAndCustomerEmailId;
+import static com.ekart.util.AuthenticationHelper.getEmailFromJwt;
 
 @RestController
 @RequestMapping("/address")
@@ -27,68 +27,107 @@ import static com.ekart.util.AuthenticationHelper.*;
 public class AddressController {
     private final JwtService jwtService;
     private final AddressService addressService;
-    @PostMapping("/addAddress")
 
+    /**
+     * Add a new address for the user.
+     *
+     * @param addressDto The address information to add.
+     * @param request    The HTTP request.
+     * @return ResponseEntity containing ApiResponse with the added Address.
+     * @throws UnAuthorizedUserException if the user is not authorized.
+     */
+    @PostMapping("/addAddress")
     public ResponseEntity<ApiResponse> addAddress(@RequestBody @Valid AddressDto addressDto,
-                                                   HttpServletRequest request
+                                                  HttpServletRequest request
     ) throws UnAuthorizedUserException {
-        log.info("addAddress called  ");
-        //get email from JWT(request)
+        log.info("addAddress called");
+
+        // Get email from JWT(request)
         String emailId = getEmailFromJwt(request);
-        //check authorization
-        compareJwtEmailIdAndCustomerEmailId(request,jwtService,emailId);
-        Address result = addressService.addAddress(addressDto,emailId);
-        ApiResponse apiresponse = new ApiResponse(HttpStatus.CREATED.value(), "Address is added successfully", result);
-        return new ResponseEntity<>(apiresponse, HttpStatus.OK);
+
+        // Check authorization
+        compareJwtEmailIdAndCustomerEmailId(request, jwtService, emailId);
+
+        // Add the address
+        Address result = addressService.addAddress(addressDto, emailId);
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.CREATED.value(), "Address is added successfully", result);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
+    /**
+     * Delete an address for the user.
+     *
+     * @param addressId The ID of the address to delete.
+     * @param request   The HTTP request.
+     * @return ResponseEntity containing ApiResponse with the deletion result message.
+     * @throws UnAuthorizedUserException if the user is not authorized.
+     */
     @PostMapping("/{addressId}/deleteAddress")
-
     public ResponseEntity<ApiResponse> deleteAddress(@PathVariable int addressId,
-                                                      HttpServletRequest request
+                                                     HttpServletRequest request
     ) throws UnAuthorizedUserException {
         log.info("inside deleteAddress method controller");
-        //get email from JWT(request)
+
+        // Get email from JWT(request)
         String emailId = getEmailFromJwt(request);
 
-        //check authorization
-        compareJwtEmailIdAndCustomerEmailId(request,jwtService,emailId);
+        // Check authorization
+        compareJwtEmailIdAndCustomerEmailId(request, jwtService, emailId);
 
+        // Delete the address
         String result = addressService.deleteAddress(addressId);
-        ApiResponse apiresponse = new ApiResponse(HttpStatus.CREATED.value(), "Address is deleted successfully", result);
-        return new ResponseEntity<>(apiresponse, HttpStatus.OK);
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.CREATED.value(), "Address is deleted successfully", result);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
-
+    /**
+     * Update an existing address for the user.
+     *
+     * @param addressId  The ID of the address to update.
+     * @param request    The HTTP request.
+     * @param addressDto The updated address information.
+     * @return ResponseEntity containing ApiResponse with the updated Address.
+     * @throws UnAuthorizedUserException if the user is not authorized.
+     */
     @PostMapping("/{addressId}/updateAddress")
-
     public ResponseEntity<ApiResponse> updateAddress(@PathVariable int addressId,
-                                                      HttpServletRequest request,
-                                                      @RequestBody @Valid AddressDto addressDto
+                                                     HttpServletRequest request,
+                                                     @RequestBody @Valid AddressDto addressDto
     ) throws UnAuthorizedUserException {
         log.info("inside updateAddress method controller");
-        //get email from JWT(request)
+
+        // Get email from JWT(request)
         String emailId = getEmailFromJwt(request);
 
-        //check authorization
-        compareJwtEmailIdAndCustomerEmailId(request,jwtService,emailId);
+        // Check authorization
+        compareJwtEmailIdAndCustomerEmailId(request, jwtService, emailId);
 
-        Address result = addressService.updateAddress(addressId,addressDto);
-        ApiResponse apiresponse = new ApiResponse(HttpStatus.CREATED.value(), "Address is updated successfully", result);
-        return new ResponseEntity<>(apiresponse, HttpStatus.OK);
+        // Update the address
+        Address result = addressService.updateAddress(addressId, addressDto);
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.CREATED.value(), "Address is updated successfully", result);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
+    /**
+     * Get all addresses for the user.
+     *
+     * @param request The HTTP request.
+     * @return ResponseEntity containing ApiResponse with a list of addresses.
+     * @throws UnAuthorizedUserException if the user is not authorized.
+     */
     @GetMapping(value = "/getAllAddress")
-
     public ResponseEntity<ApiResponse> getAllAddress(HttpServletRequest request) throws UnAuthorizedUserException {
-        log.info("display all addresses ");
-        //get email from JWT(request)
+        log.info("display all addresses");
+
+        // Get email from JWT(request)
         String emailId = getEmailFromJwt(request);
 
-        //check authorization
-        compareJwtEmailIdAndCustomerEmailId(request,jwtService,emailId);
-        Set<Address> list = addressService.getAllAddress(emailId);
-        ApiResponse apiresponse = new ApiResponse(HttpStatus.OK.value(), "List of address", list);
-        return new ResponseEntity<>(apiresponse, HttpStatus.OK);
+        // Check authorization
+        compareJwtEmailIdAndCustomerEmailId(request, jwtService, emailId);
+
+        // Get all addresses for the user
+        Set<Address> addressList = addressService.getAllAddress(emailId);
+        ApiResponse apiResponse = new ApiResponse(HttpStatus.OK.value(), "List of addresses", addressList);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 }

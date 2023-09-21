@@ -28,7 +28,7 @@ private final JwtService jwtService;
 
     @PostMapping(value = "/{categoryId}/upload")
 
-    public ResponseEntity<ApiResponse> upload(
+    public ResponseEntity<ApiResponse> uploadCategoryImage(
                                               @PathVariable int categoryId,
                                               @RequestParam(required = false) MultipartFile file,
                                               HttpServletRequest request

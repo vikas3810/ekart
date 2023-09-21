@@ -88,7 +88,7 @@ public class UserController {
      * @param session The HTTP session.
      * @param emailId The email ID for which OTP is sent.
      * @return ResponseEntity with a success message.
-     * @throws UnAuthorizedUserException If the user is not authorized.
+     *
      */
     @PostMapping("/forgotPasswordSendOTP/{emailId}")
     public ResponseEntity<ApiResponse> forgotPasswordSendOTP(HttpSession session,
@@ -109,7 +109,7 @@ public class UserController {
      * @param emailId               The email ID for which OTP is verified.
      * @param forgotPasswordDto     The DTO containing new password.
      * @return ResponseEntity with a success message or error message.
-     * @throws UnAuthorizedUserException If the user is not authorized.
+     *
      */
     @PostMapping("/forgotPasswordVerifyOTP")
     public ResponseEntity<ApiResponse> forgotPasswordVerifyOTP(@SessionAttribute("OTP") String OTP,

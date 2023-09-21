@@ -11,7 +11,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 public interface CategoryService {
-    int addCategory(@Valid CategoryDto categoryDto, String emailId) throws EntityAlreadyExistException, InvalidCategoryTypeException, DocumentAlreadyExistsException;
+    Category addCategory(@Valid CategoryDto categoryDto, String emailId) throws EntityAlreadyExistException, InvalidCategoryTypeException, DocumentAlreadyExistsException;
     String delete(@Valid int categoryId);
 
     String update(int categoryId, String emailId, CategoryDto categoryDto) throws InvalidCategoryTypeException;

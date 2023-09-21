@@ -37,7 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @throws DocumentAlreadyExistsException If the category type already exists.
      */
     @Override
-    public int addCategory(CategoryDto categoryDto, String emailId)
+    public Category addCategory(CategoryDto categoryDto, String emailId)
             throws InvalidCategoryTypeException, DocumentAlreadyExistsException {
         log.info("Inside addCategory method");
 
@@ -63,9 +63,9 @@ public class CategoryServiceImpl implements CategoryService {
                 .slug(categoryDto.getSlug())
                 .build();
 
-        // Save the category
-        Category savedCategory = categoryRepo.save(category);
-        return savedCategory.getCategoryId();
+        // Save and return the category
+        return  categoryRepo.save(category);
+
     }
 
     /**
